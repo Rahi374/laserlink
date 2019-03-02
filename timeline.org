@@ -170,3 +170,69 @@ i think i might just switch to raspi + arduino
 04:20
 
 okay raspi is booting now
+
+05:22
+
+got the circuits built
+
+05:52
+
+got the setup built
+
+06:04
+
+okay i think i need to check the thresholds
+
+oh yeah also turn all those waitloops into timeout functions
+- if something dies we need to exit
+
+07:55
+
+lmao turns out the thresholds were bad coz my circuit was wrong XD
+
+08:25
+
+hmm now gotta do the serial port communication
+
+the question is if i can do it faster in C or learn it in ruby...
+
+11:40
+
+dammit i can't get the send-many one ack thing to work for the data portion
+- imma just do stop-and-wait for each bit...
+- the bottleneck is still reading the analog pin (100us) which is necessary
+  anyway for normal reading
+  - adding an extra digital write isn't much overhead - only 3.5us
+  - although the ack you take another 100us + 3.5us - half the bw :/
+
+12:53
+
+got some data!
+
+not the data that i wanted but still improvement (had to do stop-and-wait for
+each bit)
+
+13:54
+
+the data isn't exactly what i want but it's consistent! :D
+...kind of...
+
+...three hours left...
+
+and it looks like the problem is only in the data sending - the protocol part
+has no problem
+
+14:01
+
+aaaah i think i figured it out
+
+it looks like the receiver is receiving a flat signal from the previous
+section, then the bits are flipped
+
+3.5 us to digital write
+100 us for analog read
+
+16:47
+
+submitted to devpost and finished organizing gits... it's giveup time the
+damn thing doesn't want to synchronize :/
