@@ -8,7 +8,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define BUFLEN 256
+#define BUFLEN 32
 
 int main(int argc, char *argv[])
 {
@@ -44,9 +44,17 @@ int main(int argc, char *argv[])
 
 	while (1) {
 		printf("> ");
+		memset(user_in, 0, sizeof(user_in));
 		if (!fgets(user_in, BUFLEN, stdin))
 			continue;
+		printf("user input = %s\n", user_in);
 		write(fd, user_in, strlen(user_in));
+
+		while (1) {
+			n = read(fd, buf, BUFLEN);
+			buf[n] = 0;
+			printf(buf);
+		}
 	}
 
 	return 0;
