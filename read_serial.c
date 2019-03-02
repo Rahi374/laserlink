@@ -30,7 +30,11 @@ int main(int argc, char *argv[])
 	struct termios toptions;
 
 	/* open serial port */
-	fd = open("/dev/tty96B0", O_RDWR | O_NOCTTY);
+	fd = open(argv[1], O_RDWR | O_NOCTTY);
+	if (fd < 0) {
+		perror("error opening serial");
+		return 1;
+	}
 	printf("fd opened as %i\n", fd);
 
 	/* wait for the Arduino to reboot */
