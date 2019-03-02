@@ -1,0 +1,166 @@
+20:00
+
+figured out how to set digital pin
+
+next: need to figure out how to set analog pin
+also how to read from phototransistor
+
+21:00
+
+figured out how to read serial data
+
+next: figure out how to set analog pin
+also need to read from phototransistor
+
+21:30
+
+finished break (to finish french hw and pay rent)
+
+22:05
+
+okay got analog reading working
+
+it's reacting at room light level though -- so it's too sensitive; need to
+lower sensitivity
+
+yeah okay so right now we're using 220 ohms let's lower it
+
+100 is still too much let's go 47 :/
+
+22:25
+
+20 was still a bit much (or it might've worked) but anyway im going with 10
+ohms
+
+okay so now the last component is actually sending the laser
+
+oh also arduino reading from serial (but i think that should be fine)
+
+23:13
+
+okay figured out the laser modulation
+
+23:33
+
+back from visiting shibo
+
+00:12
+
+still thinking about encoding
+
+can't use non encodings with three states
+
+no bipolar encoding
+
+tbh manchester looks really good - the only downside is that the bandwidth is
+halved
+- although... the TTL laser is 50 kHz
+- the atmega is 16 MHz - so no problem there
+- half bandwidth means 25 kHz -> 25kbps
+- hm looks like 50 kHz isn't enough for 480p H.264 low quality anyway
+  - maybe 2 fps - that's probably good enough for show
+
+okay we're going for manchester encoding then - it's 00:23 now
+
+oh also little note so i can close adafruit - both lasers are 5mW
+
+oh also apparently the non-ttl can also modulate quickly - let's say 10ms
+(coz i can't see any lower than that)
+
+so we're going to have a "clock" speed of 50kHz - the limit of the ttl laser
+
+it'll send a "going to send packet" thingy that will include clock rate and
+data length and it will expect an ack from the receiver (or denial) within 1ms
+- which means we'll need a different bit encoding for the send request
+- max data length is 512 bytes - arduino only has 2k ram
+  - although, at 25kbps it'll take... oh still less than 1s okay we're good
+
+once the sender receives an ack it'll send the data
+
+
+00:48
+
+okay here's v2 design
+
+sender receives data from serial (with a marker, like "send data" or
+something)
+
+sender says "gonna send packet", receiver sends ack (if refuse, then ignore
+request) - i think we'll just send one "on" and then expect another "on"
+- wait we'll have to turn this into a ping because someone might want to send
+- wait we have the walkie-talkie problem - ah, figured it out, after sending,
+  wait for some time (1ms?) and if no sending request then send
+  - ugh im not sure this is going to work; we have a race condition if the
+    send request comes between the listen block and the send block (at least
+    before the send requst)
+
+then sender sends 512-byte packet - receiver collects into buffer and sends
+through serial, and send ack
+
+if sending request is ignored, wait 1ms and try again
+
+so we'll need a state machine (see notebook)
+- well that ended up being a really simple state machine
+
+oh what apparently it takes 100us (10kHz) to read an analog pin - so that's
+our real bottleneck :/ - that means that we can do two-way communication with
+the non-ttl laser too
+
+01:41
+
+ugh dammit what to do about this damn race
+
+i think the easiest way is honestly just to only allow one side to send
+- we can explain that in real life we would have multiple microprocessirs to
+  mitigate this walkie-talkie problem
+
+so that's what we're going to do
+
+02:05
+
+hm i think the second request is just going to be an on, and when the receiver
+turns on the sender turns off, and once the receiver turns off then start
+sending the data
+- plus then we don't have to worry about timeouts and resending or
+  accidentally missing the message
+
+now that i think about it, i don't think the manchester encoding is necessary
+- as long as we transmit at a speed equal to or less than the sampling
+  interval, then it is guaranteed that no bit will be lost (assuming a stable
+  medium)
+- then we just start the transmission with an extra "on" bit to initiate the
+  receiver's timer
+
+02:44
+
+so im being lazy and going to always send a full packet lol so that means we
+gotta reduce the packet size
+let's go with 256 bytes
+
+and yeah we're going to go with a simple non-return to zero unipolar
+encoding, that starts with a 1 (should be discarded by the receiver)
+
+02:50
+
+finished the sender
+
+03:33
+
+okay finished the receiver too
+
+time to test :)
+
+oh wait to test we need a serial driver too :/
+
+or actually not we could just test with strings first
+
+04:00
+
+welp turns out i can't get serial console on this dragonboard
+
+i think i might just switch to raspi + arduino
+
+04:20
+
+okay raspi is booting now
+https://chrisheydrick.com/2012/06/24/how-to-read-serial-data-from-an-arduino-in-linux-with-c-part-4/
