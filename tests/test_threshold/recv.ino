@@ -18,7 +18,7 @@ void setup()
 void loop()
 {
 	if (Serial.available() > 0) {
-		Serial.write(analogRead(pt_pin));
+		Serial.println(analogRead(pt_pin));
 		Serial.read();
 	}
 }
