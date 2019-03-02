@@ -1,3 +1,10 @@
+* notes
+
+https://chrisheydrick.com/2012/06/24/how-to-read-serial-data-from-an-arduino-in-linux-with-c-part-4/
+
+~/usr/share/arduino/Arduino.mk~ - is the makefile
+
+* timeline
 20:00
 
 figured out how to set digital pin
@@ -163,4 +170,3 @@ i think i might just switch to raspi + arduino
 04:20
 
 okay raspi is booting now
-https://chrisheydrick.com/2012/06/24/how-to-read-serial-data-from-an-arduino-in-linux-with-c-part-4/
