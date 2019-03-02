@@ -1,7 +1,7 @@
 const int pt_pin = A5;
 const int laser_pin = 10;
 
-const int pt_thres = 1020;
+const int pt_thres = 200;
 
 // in ms
 const int send_timeout = 1;
