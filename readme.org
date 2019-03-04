@@ -1,3 +1,35 @@
+devpost link: [https://devpost.com/software/laserlink-i07wv8]
+
+* Inspiration
+
+A long time ago I saw this video (https://www.youtube.com/watch?v=DtCwJU6YMaA) where they send music through a laser. I wondered if the same thing was possible with arbitrary digital data.
+
+* What it does
+
+It transmits arbitrary data (for this hackathon, just text data through a laser, and via serial port on a host machine (with a client).
+
+* How I built it
+
+I needed a microprocessor for the hard real time requirement of modulating and demodulating the laser. Thus I used an arduino, but also the mezzanine shield on a dragonboard. The arduino could have simply been on the host dev machine, but I had it connected to a raspberry pi. Then I had a breadboard for each atmega with a laser sending and phototransistor receiving circuit. The last part was the software. Since I only had two lasers and two phototransistors, I faced the walkie-talkie problem and ended up making it unidirectional transfer only, so there was a sending laser driver and a receiving laser driver for the atmegas, and a sending and receiving for the host machines as well.
+
+* Challenges I ran into
+
+I've never done arduino programming before so I had to learn from zero. Also I had to figure out how to use the laser that can only be on or off to transmit data (there's not clock!). I also accidentally got the circuit wrong and wasted a lot of time trying to appease the phototransistor's sensitivity. The biggest problem was indeed synchronization between the two laser controllers, which I ended up not being able to do, so the data transmitted was neither accurate not consistent.
+
+* Accomplishments that I'm proud of
+
+I'm impressed how much arduino programming I managed to learn in one sitting. Also I leaned simple circuit design for phototransistors. I also actually managed to get the protocol surrounding the data working well (but not the data transmission itself).
+
+* What I learned
+
+Same as my accomplishments, I think. Arduino, protocol design, circuit design.
+
+* What's next for laserlink
+
+Lasers in parallel. That would fix the walkie-talkie problem, and the problem of the lack of a clock. Maybe more powerful microprocessors with faster ADCs, so that the transmission speed and therefor the bandwidth could be increased.
+
+* Why the transmission didn't work
+
 I realized why it didn't work even with the per-bit stop-and-wait
 
 - the receiver sends an ack, then reads the next bit
