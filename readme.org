@@ -1,0 +1,21 @@
+I realized why it didn't work even with the per-bit stop-and-wait
+
+- the receiver sends an ack, then reads the next bit
+- the sender waits for an ack before sending the next bit
+
+the problem is that the receiver sending an ack costs 3.5us, then it takes at
+least 100us (or 200us, since it's a read loop) to read the ack, by which time
+the receiver has already incorrectly read the "next" bit and send the ack for
+that bit. The sender will then send its bit, and notice the ack and send the
+next bit. If it's unlucky then the it will have to wait for the listener to
+mistakenly read the next two bits before its ack is correct.
+
+The problem here is that the receiver synchronizes the host, but the host
+cannot synchronize the receiver. Even if the sender can read the ack at the
+same speed (or same order of magntude at least) as the receiver sending the
+ack, the receiver will always be a us or so ahead of the host and read the
+wrong bit.
+
+A solution is to have the receiver wait for a while after acking every bit.
+This will give time to the sender to send the next bit, and it will not move
+on without the receiver's ack.
